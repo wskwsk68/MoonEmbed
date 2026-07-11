@@ -2,6 +2,11 @@
 
 MoonEmbed is a MoonBit-first library for working with word embeddings locally.
 
+Repository links:
+
+- GitHub: [https://github.com/wskwsk68/MoonEmbed](https://github.com/wskwsk68/MoonEmbed)
+- GitLink: [https://gitlink.org.cn/wskwsk68/MoonEmbed](https://gitlink.org.cn/wskwsk68/MoonEmbed)
+
 ## What it does
 
 - Load word2vec text embeddings

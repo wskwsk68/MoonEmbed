@@ -4,6 +4,11 @@
 
 MoonEmbed: Native word embedding loading and lightweight vector retrieval in MoonBit
 
+Repository links:
+
+- GitHub: https://github.com/wskwsk68/MoonEmbed
+- GitLink: https://gitlink.org.cn/wskwsk68/MoonEmbed
+
 ## Problem
 
 Many embedding demos depend on Python, SQLite, or a full vector database.
@@ -40,3 +45,7 @@ Build a MoonBit-native library that can:
 - optional metadata filters
 - more sophisticated ANN indexing
 - browser-facing demo
+
+## Submission note
+
+The implementation is kept to one main contributor and a public MoonBit codebase, with the goal of matching the contest's expectations around readable source, tests, CI, and a reproducible demo.

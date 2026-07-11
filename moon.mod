@@ -9,7 +9,7 @@
 //   "moonbitlang/x@0.4.6",
 // }
 
-name = "hzfhzf89/MoonEmbed"
+name = "wskwsk68/MoonEmbed"
 
 version = "0.1.0"
 
