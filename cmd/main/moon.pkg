@@ -1,0 +1,7 @@
+import {
+  "username/MoonEmbed",
+}
+
+options(
+  "is-main": true,
+)
