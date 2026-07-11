@@ -42,3 +42,10 @@ test {
   inspect(report.hits.length(), content="0")
   inspect(report.scanned, content="0")
 }
+
+test {
+  let corpus = demo_corpus()
+  inspect(corpus.has_token("king"), content="true")
+  inspect(corpus.tokens().length(), content="6")
+  inspect(demo_index().search_token("queen", 2).hits.length(), content="2")
+}

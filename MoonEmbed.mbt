@@ -188,6 +188,20 @@ pub fn EmbeddingCorpus::lookup(
 }
 
 ///|
+pub fn EmbeddingCorpus::has_token(self : EmbeddingCorpus, token : String) -> Bool {
+  self.token_index.get(token) is Some(_)
+}
+
+///|
+pub fn EmbeddingCorpus::tokens(self : EmbeddingCorpus) -> Array[String] {
+  let tokens = []
+  for record in self.records {
+    tokens.push(record.token)
+  }
+  tokens
+}
+
+///|
 pub fn EmbeddingCorpus::record(
   self : EmbeddingCorpus,
   index : Int,
@@ -461,6 +475,18 @@ pub fn MoonEmbedIndex::search(
     scanned = scanned + 1
   }
   { hits, scanned, candidates: candidates.length() }
+}
+
+///|
+pub fn MoonEmbedIndex::search_token(
+  self : MoonEmbedIndex,
+  token : String,
+  k : Int,
+) -> SearchReport {
+  match self.corpus.lookup(token) {
+    Some(vector) => self.search(vector, k)
+    None => { hits: [], scanned: 0, candidates: 0 }
+  }
 }
 
 ///|
