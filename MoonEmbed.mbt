@@ -6,6 +6,15 @@ pub(all) enum SourceFormat {
 }
 
 ///|
+pub fn SourceFormat::label(self : SourceFormat) -> String {
+  match self {
+    Word2VecText => "word2vec-text"
+    Word2VecBinary => "word2vec-binary"
+    GloVeText => "glove-text"
+  }
+}
+
+///|
 pub(all) struct EmbeddingRecord {
   token : String
   vector : Array[Double]
@@ -160,6 +169,11 @@ pub fn EmbeddingCorpus::from_records(
 ///|
 pub fn EmbeddingCorpus::size(self : EmbeddingCorpus) -> Int {
   self.records.length()
+}
+
+///|
+pub fn EmbeddingCorpus::describe(self : EmbeddingCorpus) -> String {
+  "size=\{self.size()}, dim=\{self.dim}, source=\{self.source.label()}"
 }
 
 ///|
@@ -333,6 +347,11 @@ pub fn MoonEmbedIndex::from_corpus(
   signature_bits : Int,
 ) -> MoonEmbedIndex {
   MoonEmbedIndex::new(corpus, signature_bits)
+}
+
+///|
+pub fn MoonEmbedIndex::describe(self : MoonEmbedIndex) -> String {
+  "\{self.corpus.describe()}, signature_bits=\{self.signature_bits}"
 }
 
 ///|

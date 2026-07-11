@@ -31,3 +31,8 @@ test {
   let report = index.search([1.0, 0.0, 0.0], 1)
   inspect(report.hits[0].token, content="alpha")
 }
+
+test {
+  inspect(SourceFormat::GloVeText.label(), content="glove-text")
+  inspect(demo_index().describe().contains("signature_bits=3"), content="true")
+}
