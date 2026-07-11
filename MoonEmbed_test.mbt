@@ -36,3 +36,9 @@ test {
   inspect(SourceFormat::GloVeText.label(), content="glove-text")
   inspect(demo_index().describe().contains("signature_bits=3"), content="true")
 }
+
+test {
+  let report = demo_index().search_terms("not-a-real-token", 3)
+  inspect(report.hits.length(), content="0")
+  inspect(report.scanned, content="0")
+}

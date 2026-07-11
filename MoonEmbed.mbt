@@ -491,7 +491,7 @@ pub fn MoonEmbedIndex::search_terms(
     }
   }
   if seen == 0 {
-    panic()
+    return { hits: [], scanned: 0, candidates: 0 }
   }
   for i in 0..<query.length() {
     query[i] = query[i] / seen.to_double()
