@@ -3,8 +3,10 @@
 /// Run with `moon run cmd/main` from the project root.
 fn main {
   let index = @MoonEmbed.demo_index()
-  let report = index.search_terms("king", 3)
+  let corpus = index.corpus()
+  let report = index.search_token("king", 3)
   println("MoonEmbed demo")
-  println(index.describe())
+  println(corpus.describe())
+  println("token_count=\{corpus.tokens().length()}")
   println(@MoonEmbed.format_report(report))
 }
