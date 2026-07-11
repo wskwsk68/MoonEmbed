@@ -9,7 +9,7 @@
 //   "moonbitlang/x@0.4.6",
 // }
 
-name = "username/MoonEmbed"
+name = "hzfhzf89/MoonEmbed"
 
 version = "0.1.0"
 
