@@ -53,7 +53,7 @@ let corpus = EmbeddingCorpus::from_glove_text(
   "king 0.92 0.10 0.00\nqueen 0.90 0.14 0.00\n",
 )
 let index = MoonEmbedIndex::from_corpus(corpus, signature_bits=3)
-let report = index.search_terms("king", 3)
+let report = index.search_token("king", 3)
 println(format_report(report))
 ```
 
