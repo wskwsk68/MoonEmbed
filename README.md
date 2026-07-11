@@ -20,6 +20,13 @@ Repository links:
 
 The contest page encourages a public repository, clear README, runnable example, CI, tests, and an OSI license. MoonEmbed stays focused on one practical niche: semantic word lookup without depending on Python or a database.
 
+Contest readiness:
+
+- single contributor
+- commit history expanded into multiple meaningful steps
+- public-source-only implementation
+- clear source notes and OSI license
+
 I deliberately kept it narrower than a general vector database so it does not overlap too closely with existing MoonBit ecosystem work such as broader ANN/vector DB packages.
 
 ## Repository layout

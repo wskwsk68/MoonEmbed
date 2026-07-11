@@ -9,6 +9,8 @@ This file tracks the items the contest page explicitly cares about.
 - [x] Tests in `MoonEmbed_test.mbt`
 - [x] CI workflow in `.github/workflows/ci.yml`
 - [x] README present in both MoonBit and GitHub-friendly form
+- [x] Single contributor only, no virtual or extra contributors
+- [x] Commit count is above 10 after the final pass
 
 ## Submission quality
 
@@ -32,6 +34,7 @@ This file tracks the items the contest page explicitly cares about.
 - [ ] Export the proposal as the required one-page PDF
 - [ ] Verify the remote default branch is `main`
 - [ ] Confirm the mooncakes.io publication link if you choose to publish the package
+- [ ] Make sure the GitLink repository is pushed from the same source tree
 
 ## Source notes
 
