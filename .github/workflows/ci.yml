@@ -2,6 +2,8 @@ name: ci
 
 on:
   push:
+    branches:
+      - main
   pull_request:
 
 jobs:
@@ -10,9 +12,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: moonbitlang/setup-moonbit@v1
-      - name: Check
-        run: moon check
+        with:
+          version: '0.10.3'
+      - name: Check Format
+        run: moon fmt --check
+      - name: Strict Check
+        run: moon check --deny-warn
+      - name: Generate Interface
+        run: |
+          moon info
+          git diff --exit-code pkg.generated.mbti || (echo "Please run 'moon info' locally and commit the updated pkg.generated.mbti" && exit 1)
       - name: Test
         run: moon test
-      - name: Build demo
+      - name: Build Demo
         run: moon build

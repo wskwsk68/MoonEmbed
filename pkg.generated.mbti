@@ -1,0 +1,92 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "wskwsk68/MoonEmbed"
+
+// Values
+pub fn demo_corpus() -> EmbeddingCorpus
+
+pub fn demo_index() -> MoonEmbedIndex
+
+pub fn euclidean_distance(Array[Double], Array[Double]) -> Double
+
+pub fn format_report(SearchReport) -> String
+
+pub fn manhattan_distance(Array[Double], Array[Double]) -> Double
+
+// Errors
+
+// Types and methods
+pub(all) struct Document {
+  id : String
+  metadata : Map[String, String]
+  text : String
+  vector : Array[Double]?
+}
+pub fn Document::new(String, String, metadata? : Map[String, String]) -> Self
+
+pub(all) struct DocumentStore {
+  docs : Array[Document]
+}
+pub fn DocumentStore::add_document(Self, Document, EmbeddingCorpus) -> Unit
+pub fn DocumentStore::new() -> Self
+pub fn DocumentStore::search(Self, Array[Double], String?, String?, Int) -> Array[Document]
+
+pub(all) struct EmbeddingCorpus {
+  records : Array[EmbeddingRecord]
+  token_index : Map[String, Int]
+  dim : Int
+  source : SourceFormat
+}
+pub fn EmbeddingCorpus::describe(Self) -> String
+pub fn EmbeddingCorpus::from_glove_text(String) -> Self raise
+pub fn EmbeddingCorpus::from_records(Array[EmbeddingRecord], SourceFormat) -> Self
+pub fn EmbeddingCorpus::from_word2vec_binary(Bytes) -> Self raise
+pub fn EmbeddingCorpus::from_word2vec_text(String) -> Self raise
+pub fn EmbeddingCorpus::has_token(Self, String) -> Bool
+pub fn EmbeddingCorpus::lookup(Self, String) -> Array[Double]?
+pub fn EmbeddingCorpus::record(Self, Int) -> EmbeddingRecord
+pub fn EmbeddingCorpus::sentence_embedding(Self, String) -> Array[Double]?
+pub fn EmbeddingCorpus::size(Self) -> Int
+pub fn EmbeddingCorpus::tokens(Self) -> Array[String]
+
+pub(all) struct EmbeddingRecord {
+  token : String
+  vector : Array[Double]
+}
+pub fn EmbeddingRecord::new(String, Array[Double]) -> Self
+
+pub(all) struct MoonEmbedIndex {
+  corpus : EmbeddingCorpus
+  buckets : Array[Array[Int]]
+  signature_bits : Int
+}
+pub fn MoonEmbedIndex::corpus(Self) -> EmbeddingCorpus
+pub fn MoonEmbedIndex::describe(Self) -> String
+pub fn MoonEmbedIndex::from_corpus(EmbeddingCorpus, Int) -> Self
+pub fn MoonEmbedIndex::new(EmbeddingCorpus, Int) -> Self
+pub fn MoonEmbedIndex::search(Self, Array[Double], Int) -> SearchReport
+pub fn MoonEmbedIndex::search_exact(Self, Array[Double], Int) -> SearchReport
+pub fn MoonEmbedIndex::search_terms(Self, String, Int) -> SearchReport
+pub fn MoonEmbedIndex::search_token(Self, String, Int) -> SearchReport
+
+pub(all) struct SearchHit {
+  token : String
+  score : Double
+}
+
+pub(all) struct SearchReport {
+  hits : Array[SearchHit]
+  scanned : Int
+  candidates : Int
+}
+
+pub(all) enum SourceFormat {
+  Word2VecText
+  Word2VecBinary
+  GloVeText
+}
+pub fn SourceFormat::label(Self) -> String
+
+// Type aliases
+
+// Traits
+

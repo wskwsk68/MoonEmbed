@@ -188,7 +188,10 @@ pub fn EmbeddingCorpus::lookup(
 }
 
 ///|
-pub fn EmbeddingCorpus::has_token(self : EmbeddingCorpus, token : String) -> Bool {
+pub fn EmbeddingCorpus::has_token(
+  self : EmbeddingCorpus,
+  token : String,
+) -> Bool {
   self.token_index.get(token) is Some(_)
 }
 
@@ -533,6 +536,164 @@ pub fn format_report(report : SearchReport) -> String {
     out = out + "\{hit.token}\t\{hit.score.to_string()}\n"
   }
   out
+}
+
+///|
+pub fn euclidean_distance(
+  left : Array[Double],
+  right : Array[Double],
+) -> Double {
+  let mut sum = 0.0
+  let len = if left.length() < right.length() {
+    left.length()
+  } else {
+    right.length()
+  }
+  for i in 0..<len {
+    let diff = left[i] - right[i]
+    sum = sum + diff * diff
+  }
+  sum.sqrt()
+}
+
+///|
+pub fn manhattan_distance(
+  left : Array[Double],
+  right : Array[Double],
+) -> Double {
+  let mut sum = 0.0
+  let len = if left.length() < right.length() {
+    left.length()
+  } else {
+    right.length()
+  }
+  for i in 0..<len {
+    let diff = left[i] - right[i]
+    let abs_diff = if diff < 0.0 { -diff } else { diff }
+    sum = sum + abs_diff
+  }
+  sum
+}
+
+///|
+pub fn EmbeddingCorpus::sentence_embedding(
+  self : EmbeddingCorpus,
+  text : String,
+) -> Array[Double]? {
+  let mut query = []
+  let mut seen = 0
+  for term in text.split(" ") {
+    let token = term.trim()
+    if token.is_empty() {
+      continue
+    }
+    match self.lookup(token.to_owned()) {
+      Some(vector) => {
+        if query.is_empty() {
+          query = copy_vector(vector)
+        } else {
+          for i in 0..<query.length() {
+            query[i] = query[i] + vector[i]
+          }
+        }
+        seen = seen + 1
+      }
+      None => ()
+    }
+  }
+  if seen == 0 {
+    return None
+  }
+  for i in 0..<query.length() {
+    query[i] = query[i] / seen.to_double()
+  }
+  normalize_in_place(query)
+  Some(query)
+}
+
+///|
+pub(all) struct Document {
+  id : String
+  metadata : Map[String, String]
+  text : String
+  vector : Array[Double]?
+}
+
+///|
+pub fn Document::new(
+  id : String,
+  text : String,
+  metadata? : Map[String, String] = Map([]),
+) -> Document {
+  { id, metadata, text, vector: None }
+}
+
+///|
+pub(all) struct DocumentStore {
+  docs : Array[Document]
+}
+
+///|
+pub fn DocumentStore::new() -> DocumentStore {
+  { docs: [] }
+}
+
+///|
+pub fn DocumentStore::add_document(
+  self : DocumentStore,
+  doc : Document,
+  corpus : EmbeddingCorpus,
+) -> Unit {
+  let doc = { ..doc, vector: corpus.sentence_embedding(doc.text) }
+  self.docs.push(doc)
+}
+
+///|
+pub fn DocumentStore::search(
+  self : DocumentStore,
+  query_vector : Array[Double],
+  filter_key : String?,
+  filter_value : String?,
+  k : Int,
+) -> Array[Document] {
+  let q = normalize_query(query_vector)
+  let hits : Array[(Document, Double)] = []
+
+  for doc in self.docs {
+    // Check metadata filter
+    let mut pass = true
+    match (filter_key, filter_value) {
+      (Some(k), Some(v)) =>
+        match doc.metadata.get(k) {
+          Some(doc_val) => if doc_val != v { pass = false }
+          None => pass = false
+        }
+      _ => ()
+    }
+
+    if pass {
+      match doc.vector {
+        Some(vec) => {
+          let score = dot(q, vec)
+          let mut pos = hits.length()
+          while pos > 0 && hits[pos - 1].1 < score {
+            pos = pos - 1
+          }
+          hits.insert(pos, (doc, score))
+          if hits.length() > k {
+            let _ = hits.pop()
+          }
+        }
+        None => ()
+      }
+    }
+  }
+
+  let result = []
+  for hit in hits {
+    result.push(hit.0)
+  }
+  result
 }
 
 ///|
