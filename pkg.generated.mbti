@@ -2,6 +2,10 @@
 package "wskwsk68/MoonEmbed"
 
 // Values
+pub fn cosine_distance(Array[Double], Array[Double]) -> Double
+
+pub fn cosine_similarity(Array[Double], Array[Double]) -> Double
+
 pub fn demo_corpus() -> EmbeddingCorpus
 
 pub fn demo_index() -> MoonEmbedIndex
@@ -12,9 +16,21 @@ pub fn format_report(SearchReport) -> String
 
 pub fn manhattan_distance(Array[Double], Array[Double]) -> Double
 
+pub fn recall_at_k(SearchReport, SearchReport, Int) -> Double
+
 // Errors
 
 // Types and methods
+pub(all) struct CorpusStats {
+  records : Int
+  dimension : Int
+  zero_vectors : Int
+  duplicate_tokens : Int
+  min_norm : Double
+  max_norm : Double
+}
+pub fn CorpusStats::describe(Self) -> String
+
 pub(all) struct Document {
   id : String
   metadata : Map[String, String]
@@ -23,12 +39,28 @@ pub(all) struct Document {
 }
 pub fn Document::new(String, String, metadata? : Map[String, String]) -> Self
 
+pub(all) struct DocumentHit {
+  document : Document
+  score : Double
+}
+pub fn DocumentHit::id(Self) -> String
+pub fn DocumentHit::score(Self) -> Double
+
 pub(all) struct DocumentStore {
   docs : Array[Document]
 }
 pub fn DocumentStore::add_document(Self, Document, EmbeddingCorpus) -> Unit
+pub fn DocumentStore::add_documents(Self, Array[Document], EmbeddingCorpus) -> Int
+pub fn DocumentStore::get(Self, String) -> Document?
+pub fn DocumentStore::ids(Self) -> Array[String]
+pub fn DocumentStore::is_empty(Self) -> Bool
 pub fn DocumentStore::new() -> Self
+pub fn DocumentStore::remove(Self, String) -> Bool
 pub fn DocumentStore::search(Self, Array[Double], String?, String?, Int) -> Array[Document]
+pub fn DocumentStore::search_scored(Self, Array[Double], String?, String?, Int, Double) -> Array[DocumentHit]
+pub fn DocumentStore::search_text(Self, EmbeddingCorpus, String, String?, String?, Int) -> Array[Document]
+pub fn DocumentStore::size(Self) -> Int
+pub fn DocumentStore::upsert(Self, Document, EmbeddingCorpus) -> Bool
 
 pub(all) struct EmbeddingCorpus {
   records : Array[EmbeddingRecord]
@@ -43,10 +75,17 @@ pub fn EmbeddingCorpus::from_word2vec_binary(Bytes) -> Self raise
 pub fn EmbeddingCorpus::from_word2vec_text(String) -> Self raise
 pub fn EmbeddingCorpus::has_token(Self, String) -> Bool
 pub fn EmbeddingCorpus::lookup(Self, String) -> Array[Double]?
+pub fn EmbeddingCorpus::prefix(Self, String, Int) -> Array[EmbeddingRecord]
 pub fn EmbeddingCorpus::record(Self, Int) -> EmbeddingRecord
 pub fn EmbeddingCorpus::sentence_embedding(Self, String) -> Array[Double]?
 pub fn EmbeddingCorpus::size(Self) -> Int
+pub fn EmbeddingCorpus::stats(Self) -> CorpusStats
+pub fn EmbeddingCorpus::to_glove_text(Self) -> String
+pub fn EmbeddingCorpus::to_word2vec_text(Self) -> String
 pub fn EmbeddingCorpus::tokens(Self) -> Array[String]
+pub fn EmbeddingCorpus::validate(Self) -> Bool
+pub fn EmbeddingCorpus::vector(Self, String) -> Array[Double]?
+pub fn EmbeddingCorpus::vectors(Self) -> Array[Array[Double]]
 
 pub(all) struct EmbeddingRecord {
   token : String
@@ -61,23 +100,45 @@ pub(all) struct MoonEmbedIndex {
 }
 pub fn MoonEmbedIndex::corpus(Self) -> EmbeddingCorpus
 pub fn MoonEmbedIndex::describe(Self) -> String
+pub fn MoonEmbedIndex::evaluate(Self, Array[RetrievalCase], Int) -> RetrievalMetrics
 pub fn MoonEmbedIndex::from_corpus(EmbeddingCorpus, Int) -> Self
 pub fn MoonEmbedIndex::new(EmbeddingCorpus, Int) -> Self
 pub fn MoonEmbedIndex::search(Self, Array[Double], Int) -> SearchReport
 pub fn MoonEmbedIndex::search_exact(Self, Array[Double], Int) -> SearchReport
+pub fn MoonEmbedIndex::search_many(Self, Array[Array[Double]], Int) -> Array[SearchReport]
+pub fn MoonEmbedIndex::search_prefix(Self, String, Int) -> SearchReport
 pub fn MoonEmbedIndex::search_terms(Self, String, Int) -> SearchReport
+pub fn MoonEmbedIndex::search_text(Self, String, Int) -> SearchReport
+pub fn MoonEmbedIndex::search_threshold(Self, Array[Double], Int, Double) -> SearchReport
 pub fn MoonEmbedIndex::search_token(Self, String, Int) -> SearchReport
+
+pub(all) struct RetrievalCase {
+  name : String
+  query : Array[Double]
+  expected : Array[String]
+}
+
+pub(all) struct RetrievalMetrics {
+  cases : Int
+  passed : Int
+  mean_recall : Double
+  mean_candidates : Double
+}
+pub fn RetrievalMetrics::describe(Self) -> String
 
 pub(all) struct SearchHit {
   token : String
   score : Double
 }
+pub fn SearchHit::above(Self, Double) -> Bool
 
 pub(all) struct SearchReport {
   hits : Array[SearchHit]
   scanned : Int
   candidates : Int
 }
+pub fn SearchReport::best_score(Self) -> Double?
+pub fn SearchReport::tokens(Self) -> Array[String]
 
 pub(all) enum SourceFormat {
   Word2VecText

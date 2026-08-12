@@ -103,7 +103,12 @@ fn normalize_in_place(vector : Array[Double]) -> Unit {
 ///|
 fn dot(left : Array[Double], right : Array[Double]) -> Double {
   let mut total = 0.0
-  for i in 0..<left.length() {
+  let length = if left.length() < right.length() {
+    left.length()
+  } else {
+    right.length()
+  }
+  for i in 0..<length {
     total = total + left[i] * right[i]
   }
   total
@@ -156,11 +161,17 @@ pub fn EmbeddingCorpus::from_records(
   let mut dim = 0
   for i in 0..<records.length() {
     let record = records[i]
+    if record.vector.length() == 0 {
+      panic()
+    }
     if i == 0 {
       dim = record.vector.length()
     } else if record.vector.length() != dim {
       panic()
     }
+    let normalized = copy_vector(record.vector)
+    normalize_in_place(normalized)
+    records[i] = { ..record, vector: normalized }
     token_index.set(record.token, i)
   }
   { records, token_index, dim, source }
@@ -346,6 +357,9 @@ pub fn MoonEmbedIndex::new(
   corpus : EmbeddingCorpus,
   signature_bits : Int,
 ) -> MoonEmbedIndex {
+  if signature_bits < 0 || signature_bits > 20 {
+    panic()
+  }
   let bucket_count = 1 << signature_bits
   let buckets = build_bucket_table(bucket_count)
   for i in 0..<corpus.records.length() {
@@ -450,6 +464,9 @@ pub fn MoonEmbedIndex::search_exact(
   query : Array[Double],
   k : Int,
 ) -> SearchReport {
+  if k <= 0 {
+    return { hits: [], scanned: 0, candidates: 0 }
+  }
   let q = normalize_query(query)
   let hits = []
   let mut scanned = 0
@@ -467,6 +484,9 @@ pub fn MoonEmbedIndex::search(
   query : Array[Double],
   k : Int,
 ) -> SearchReport {
+  if k <= 0 {
+    return { hits: [], scanned: 0, candidates: 0 }
+  }
   let q = normalize_query(query)
   let signature = signature_bits_count(self.signature_bits, q)
   let candidates = self.collect_candidates(signature, 32)

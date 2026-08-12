@@ -14,7 +14,11 @@ Repository links:
 - Load word2vec binary embeddings
 - Normalize vectors for cosine search
 - Search with a tiny bucketed approximate index and exact fallback
-- Provide a small CLI demo and test coverage
+- Search by token, phrase, prefix, threshold, or batch query
+- Build sentence embeddings and a metadata-filtered document store
+- Export normalized corpora as GloVe-style or word2vec text
+- Report corpus health, recall, scanned candidates, and benchmark metrics
+- Provide a small CLI demo and regression/edge-case test coverage
 
 ## Why this shape
 
@@ -46,6 +50,10 @@ moon test
 moon run cmd/main
 ```
 
+The CLI is intentionally dependency-free and uses the built-in demo corpus. It
+prints the corpus description and a top-k search result, so a fresh checkout
+has a reproducible smoke test without downloading a model.
+
 Example API:
 
 ```moonbit
@@ -57,9 +65,47 @@ let report = index.search_token("king", 3)
 println(format_report(report))
 ```
 
+For application code, `search_text` averages known token vectors, while
+`DocumentStore::search_text` adds optional metadata filtering. `search_exact`
+is available as a correctness reference for evaluating the bucket index with
+`RetrievalCase` and `MoonEmbedIndex::evaluate`.
+
+### Input and boundary behavior
+
+- Text parsers accept blank lines and validate consistent vector dimensions.
+- Word2vec text accepts an optional `count dimension` header.
+- Binary word2vec input uses little-endian IEEE-754 32-bit values.
+- Empty or unknown queries return an empty report; `k <= 0` returns no hits.
+- Records are copied and normalized when entering a corpus.
+- Tokens containing spaces are not valid embedding keys.
+- A zero vector is retained but contributes a zero similarity.
+
+### Validation and performance evidence
+
+The repository includes deterministic tests for all three input formats,
+normalization, exact and approximate search, phrase aggregation, prefix and
+threshold search, serialization shape, document lifecycle, metadata filters,
+unknown terms, empty inputs, invalid `k`, and retrieval evaluation. Run the
+following before publishing:
+
+```bash
+moon fmt --check
+moon check --deny-warn
+moon test --deny-warn
+moon build
+moon info
+```
+
+`SearchReport.candidates` and `scanned` make approximate-search tradeoffs
+observable. Use exact search as the baseline and `evaluate` to record recall
+on a domain corpus rather than relying on a synthetic timing claim.
+
 ## Source notes
 
-This repository is original MoonBit code written for the contest. If you later extend it with upstream data, ports, or borrowed algorithms, document the source, license, and porting scope clearly in this section before submission.
+This repository is original MoonBit code written for the contest. No model
+weights, private code, or third-party fixtures are bundled. If the project is
+extended with upstream data, ports, or borrowed algorithms, document the
+source, license, and porting scope in `THIRD_PARTY_NOTICES.md` before release.
 
 ## License
 
