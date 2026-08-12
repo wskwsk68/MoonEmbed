@@ -2,6 +2,12 @@
 package "wskwsk68/MoonEmbed"
 
 // Values
+pub fn compare_corpora(EmbeddingCorpus, EmbeddingCorpus) -> CorpusCompatibility
+
+pub fn corpus_health(EmbeddingCorpus) -> String
+
+pub fn corpus_quantization_error(EmbeddingCorpus, Int) -> Double
+
 pub fn cosine_distance(Array[Double], Array[Double]) -> Double
 
 pub fn cosine_similarity(Array[Double], Array[Double]) -> Double
@@ -10,17 +16,83 @@ pub fn demo_corpus() -> EmbeddingCorpus
 
 pub fn demo_index() -> MoonEmbedIndex
 
+pub fn dequantize_coordinate(Int, Int) -> Double
+
+pub fn dequantize_vector(Array[Int], Int) -> Array[Double]
+
 pub fn euclidean_distance(Array[Double], Array[Double]) -> Double
 
 pub fn format_report(SearchReport) -> String
 
 pub fn manhattan_distance(Array[Double], Array[Double]) -> Double
 
+pub fn quantization_error(Array[Double], Int) -> Double
+
+pub fn quantize_coordinate(Double, Int) -> Int
+
+pub fn quantize_vector(Array[Double], Int) -> Array[Int]
+
 pub fn recall_at_k(SearchReport, SearchReport, Int) -> Double
+
+pub fn standard_benchmark_suite() -> BenchmarkSuite
+
+pub fn summarize_reports(Array[SearchReport]) -> RankingSummary
+
+pub fn validate_corpus(EmbeddingCorpus) -> ValidationReport
+
+pub fn validate_query(Array[Double], Int) -> ValidationReport
+
+pub fn validate_vector(Array[Double], Int) -> ValidationReport
 
 // Errors
 
 // Types and methods
+pub(all) struct BenchmarkDocument {
+  id : String
+  category : String
+  text : String
+  expected_tokens : Array[String]
+}
+pub fn BenchmarkDocument::describe(Self) -> String
+
+pub(all) struct BenchmarkReport {
+  suite : String
+  documents : Int
+  queries : Int
+  passed : Int
+  mean_recall : Double
+  mean_candidates : Double
+  filtered_documents : Int
+}
+pub fn BenchmarkReport::describe(Self) -> String
+
+pub(all) struct BenchmarkSuite {
+  name : String
+  documents : Array[BenchmarkDocument]
+  queries : Array[RetrievalCase]
+}
+pub fn BenchmarkSuite::add_document(Self, BenchmarkDocument) -> Unit
+pub fn BenchmarkSuite::add_query(Self, RetrievalCase) -> Unit
+pub fn BenchmarkSuite::categories(Self) -> Array[String]
+pub fn BenchmarkSuite::describe(Self) -> String
+pub fn BenchmarkSuite::document_count(Self) -> Int
+pub fn BenchmarkSuite::documents_in_category(Self, String) -> Array[BenchmarkDocument]
+pub fn BenchmarkSuite::expected_category(Self, String) -> String?
+pub fn BenchmarkSuite::new(String) -> Self
+pub fn BenchmarkSuite::query_count(Self) -> Int
+pub fn BenchmarkSuite::query_names(Self) -> Array[String]
+pub fn BenchmarkSuite::run(Self, MoonEmbedIndex, Int) -> BenchmarkReport
+pub fn BenchmarkSuite::sample_search(Self, MoonEmbedIndex, Int, Int) -> SampleStats
+
+pub(all) struct CorpusCompatibility {
+  compatible : Bool
+  same_dimension : Bool
+  shared_tokens : Int
+  left_only : Int
+  right_only : Int
+}
+pub fn CorpusCompatibility::describe(Self) -> String
+
 pub(all) struct CorpusStats {
   records : Int
   dimension : Int
@@ -39,6 +111,18 @@ pub(all) struct Document {
 }
 pub fn Document::new(String, String, metadata? : Map[String, String]) -> Self
 
+pub(all) struct DocumentFilter {
+  category : String?
+  required_tokens : Array[String]
+  excluded_tokens : Array[String]
+}
+pub fn DocumentFilter::describe(Self) -> String
+pub fn DocumentFilter::empty() -> Self
+pub fn DocumentFilter::exclude(Self, String) -> Self
+pub fn DocumentFilter::matches(Self, Document, TextTokenizer) -> Bool
+pub fn DocumentFilter::require(Self, String) -> Self
+pub fn DocumentFilter::with_category(Self, String) -> Self
+
 pub(all) struct DocumentHit {
   document : Document
   score : Double
@@ -51,15 +135,21 @@ pub(all) struct DocumentStore {
 }
 pub fn DocumentStore::add_document(Self, Document, EmbeddingCorpus) -> Unit
 pub fn DocumentStore::add_documents(Self, Array[Document], EmbeddingCorpus) -> Int
+pub fn DocumentStore::categories(Self) -> Array[String]
+pub fn DocumentStore::count_category(Self, String) -> Int
+pub fn DocumentStore::filter(Self, DocumentFilter, TextTokenizer) -> Array[Document]
 pub fn DocumentStore::get(Self, String) -> Document?
 pub fn DocumentStore::ids(Self) -> Array[String]
 pub fn DocumentStore::is_empty(Self) -> Bool
+pub fn DocumentStore::metadata_values(Self, String) -> Array[String]
 pub fn DocumentStore::new() -> Self
+pub fn DocumentStore::ranked_search(Self, Array[Double], String?, String?, Int) -> Array[RankedDocument]
 pub fn DocumentStore::remove(Self, String) -> Bool
 pub fn DocumentStore::search(Self, Array[Double], String?, String?, Int) -> Array[Document]
 pub fn DocumentStore::search_scored(Self, Array[Double], String?, String?, Int, Double) -> Array[DocumentHit]
 pub fn DocumentStore::search_text(Self, EmbeddingCorpus, String, String?, String?, Int) -> Array[Document]
 pub fn DocumentStore::size(Self) -> Int
+pub fn DocumentStore::texts(Self) -> Array[String]
 pub fn DocumentStore::upsert(Self, Document, EmbeddingCorpus) -> Bool
 
 pub(all) struct EmbeddingCorpus {
@@ -75,9 +165,11 @@ pub fn EmbeddingCorpus::from_word2vec_binary(Bytes) -> Self raise
 pub fn EmbeddingCorpus::from_word2vec_text(String) -> Self raise
 pub fn EmbeddingCorpus::has_token(Self, String) -> Bool
 pub fn EmbeddingCorpus::lookup(Self, String) -> Array[Double]?
+pub fn EmbeddingCorpus::phrase_embedding(Self, PhraseQuery) -> Array[Double]?
 pub fn EmbeddingCorpus::prefix(Self, String, Int) -> Array[EmbeddingRecord]
 pub fn EmbeddingCorpus::record(Self, Int) -> EmbeddingRecord
 pub fn EmbeddingCorpus::sentence_embedding(Self, String) -> Array[Double]?
+pub fn EmbeddingCorpus::sentence_embedding_with_tokenizer(Self, String, TextTokenizer) -> Array[Double]?
 pub fn EmbeddingCorpus::size(Self) -> Int
 pub fn EmbeddingCorpus::stats(Self) -> CorpusStats
 pub fn EmbeddingCorpus::to_glove_text(Self) -> String
@@ -93,6 +185,22 @@ pub(all) struct EmbeddingRecord {
 }
 pub fn EmbeddingRecord::new(String, Array[Double]) -> Self
 
+pub(all) struct ExplainedHit {
+  token : String
+  score : Double
+  components : ScoreComponents
+}
+pub fn ExplainedHit::describe(Self) -> String
+
+pub(all) struct IndexDiagnostics {
+  records : Int
+  dimension : Int
+  signature_bits : Int
+  nonempty_buckets : Int
+  largest_bucket : Int
+}
+pub fn IndexDiagnostics::describe(Self) -> String
+
 pub(all) struct MoonEmbedIndex {
   corpus : EmbeddingCorpus
   buckets : Array[Array[Int]]
@@ -100,17 +208,72 @@ pub(all) struct MoonEmbedIndex {
 }
 pub fn MoonEmbedIndex::corpus(Self) -> EmbeddingCorpus
 pub fn MoonEmbedIndex::describe(Self) -> String
+pub fn MoonEmbedIndex::diagnostics(Self) -> IndexDiagnostics
 pub fn MoonEmbedIndex::evaluate(Self, Array[RetrievalCase], Int) -> RetrievalMetrics
+pub fn MoonEmbedIndex::execute_plan(Self, Array[Double], QueryPlan) -> SearchReport
 pub fn MoonEmbedIndex::from_corpus(EmbeddingCorpus, Int) -> Self
 pub fn MoonEmbedIndex::new(EmbeddingCorpus, Int) -> Self
+pub fn MoonEmbedIndex::safe_search(Self, Array[Double], QueryPlan) -> (ValidationReport, SearchReport)
 pub fn MoonEmbedIndex::search(Self, Array[Double], Int) -> SearchReport
 pub fn MoonEmbedIndex::search_exact(Self, Array[Double], Int) -> SearchReport
+pub fn MoonEmbedIndex::search_explained(Self, Array[Double], Int, ScoreProfile) -> Array[ExplainedHit]
 pub fn MoonEmbedIndex::search_many(Self, Array[Array[Double]], Int) -> Array[SearchReport]
+pub fn MoonEmbedIndex::search_phrase(Self, PhraseQuery, Int) -> SearchReport
 pub fn MoonEmbedIndex::search_prefix(Self, String, Int) -> SearchReport
 pub fn MoonEmbedIndex::search_terms(Self, String, Int) -> SearchReport
 pub fn MoonEmbedIndex::search_text(Self, String, Int) -> SearchReport
 pub fn MoonEmbedIndex::search_threshold(Self, Array[Double], Int, Double) -> SearchReport
 pub fn MoonEmbedIndex::search_token(Self, String, Int) -> SearchReport
+pub fn MoonEmbedIndex::search_tokenized(Self, String, TextTokenizer, Int) -> SearchReport
+
+pub(all) struct PhraseQuery {
+  text : String
+  tokens : Array[String]
+  weights : Array[Double]
+}
+pub fn PhraseQuery::is_empty(Self) -> Bool
+pub fn PhraseQuery::new(String, TextTokenizer) -> Self
+pub fn PhraseQuery::size(Self) -> Int
+pub fn PhraseQuery::weight(Self, Int) -> Double
+
+pub(all) struct QueryPlan {
+  mode : RetrievalMode
+  k : Int
+  threshold : Double?
+  explain : Bool
+}
+pub fn QueryPlan::describe(Self) -> String
+pub fn QueryPlan::new(mode? : RetrievalMode, k? : Int, threshold? : Double, explain? : Bool) -> Self
+pub fn QueryPlan::valid(Self) -> Bool
+
+pub(all) struct QuerySampler {
+  queries : Array[Array[Double]]
+  labels : Array[String]
+  limit : Int
+}
+pub fn QuerySampler::add(Self, String, Array[Double]) -> Bool
+pub fn QuerySampler::clear(Self) -> Unit
+pub fn QuerySampler::evaluate(Self, MoonEmbedIndex, Int) -> RetrievalMetrics
+pub fn QuerySampler::is_full(Self) -> Bool
+pub fn QuerySampler::label(Self, Int) -> String?
+pub fn QuerySampler::new(Int) -> Self
+pub fn QuerySampler::query(Self, Int) -> Array[Double]?
+pub fn QuerySampler::size(Self) -> Int
+
+pub(all) struct RankedDocument {
+  id : String
+  score : Double
+  category : String
+}
+pub fn RankedDocument::describe(Self) -> String
+
+pub(all) struct RankingSummary {
+  total : Int
+  nonempty : Int
+  top_score : Double
+  average_score : Double
+}
+pub fn RankingSummary::describe(Self) -> String
 
 pub(all) struct RetrievalCase {
   name : String
@@ -126,6 +289,45 @@ pub(all) struct RetrievalMetrics {
 }
 pub fn RetrievalMetrics::describe(Self) -> String
 
+pub(all) enum RetrievalMode {
+  Exact
+  Approximate
+  Auto
+}
+pub fn RetrievalMode::label(Self) -> String
+
+pub(all) struct SampleStats {
+  mut count : Int
+  mut total : Double
+  mut minimum : Double
+  mut maximum : Double
+}
+pub fn SampleStats::add(Self, Double) -> Unit
+pub fn SampleStats::describe(Self) -> String
+pub fn SampleStats::mean(Self) -> Double
+pub fn SampleStats::new() -> Self
+
+pub(all) struct ScoreComponents {
+  lexical : Double
+  semantic : Double
+  freshness : Double
+  popularity : Double
+}
+pub fn ScoreComponents::clamp(Self) -> Self
+pub fn ScoreComponents::combine(Self, ScoreProfile) -> Double
+pub fn ScoreComponents::describe(Self) -> String
+
+pub(all) struct ScoreProfile {
+  lexical_weight : Double
+  semantic_weight : Double
+  freshness_weight : Double
+  popularity_weight : Double
+}
+pub fn ScoreProfile::balanced() -> Self
+pub fn ScoreProfile::normalized(Self) -> Self
+pub fn ScoreProfile::semantic_only() -> Self
+pub fn ScoreProfile::sum(Self) -> Double
+
 pub(all) struct SearchHit {
   token : String
   score : Double
@@ -137,8 +339,11 @@ pub(all) struct SearchReport {
   scanned : Int
   candidates : Int
 }
+pub fn SearchReport::apply_policy(Self, ThresholdPolicy) -> Self
 pub fn SearchReport::best_score(Self) -> Double?
+pub fn SearchReport::is_confident(Self, Double) -> Bool
 pub fn SearchReport::tokens(Self) -> Array[String]
+pub fn SearchReport::unique_tokens(Self) -> Array[String]
 
 pub(all) enum SourceFormat {
   Word2VecText
@@ -146,6 +351,97 @@ pub(all) enum SourceFormat {
   GloVeText
 }
 pub fn SourceFormat::label(Self) -> String
+
+pub(all) struct TextReport {
+  characters : Int
+  raw_terms : Int
+  retained_terms : Int
+  unique_terms : Int
+  stop_words : Int
+}
+pub fn TextReport::describe(Self) -> String
+
+pub(all) struct TextToken {
+  text : String
+  position : Int
+  original_length : Int
+}
+pub fn TextToken::describe(Self) -> String
+
+pub(all) struct TextTokenizer {
+  lowercase : Bool
+  keep_numbers : Bool
+  min_length : Int
+  stop_words : Map[String, Bool]
+}
+pub fn TextTokenizer::contains(Self, String, String) -> Bool
+pub fn TextTokenizer::count(Self, String) -> Int
+pub fn TextTokenizer::new(lowercase? : Bool, keep_numbers? : Bool, min_length? : Int, stop_words? : Map[String, Bool]) -> Self
+pub fn TextTokenizer::report(Self, String) -> TextReport
+pub fn TextTokenizer::tokenize(Self, String) -> Array[TextToken]
+pub fn TextTokenizer::tokens(Self, String) -> Array[String]
+pub fn TextTokenizer::weighted_tokens(Self, String) -> TokenWeights
+
+pub(all) struct ThresholdPolicy {
+  minimum_score : Double
+  maximum_results : Int
+  require_nonempty : Bool
+}
+pub fn ThresholdPolicy::accept(Self, Double) -> Bool
+pub fn ThresholdPolicy::new(minimum_score? : Double, maximum_results? : Int, require_nonempty? : Bool) -> Self
+pub fn ThresholdPolicy::valid(Self) -> Bool
+
+pub(all) struct TokenSet {
+  values : Map[String, Bool]
+  order : Array[String]
+}
+pub fn TokenSet::add(Self, String) -> Bool
+pub fn TokenSet::contains(Self, String) -> Bool
+pub fn TokenSet::difference(Self, Self) -> Self
+pub fn TokenSet::intersection(Self, Self) -> Self
+pub fn TokenSet::new() -> Self
+pub fn TokenSet::remove(Self, String) -> Bool
+pub fn TokenSet::size(Self) -> Int
+pub fn TokenSet::to_array(Self) -> Array[String]
+pub fn TokenSet::union(Self, Self) -> Self
+
+pub(all) struct TokenWeights {
+  values : Map[String, Double]
+  mut total : Double
+}
+pub fn TokenWeights::add(Self, String, Double) -> Unit
+pub fn TokenWeights::get(Self, String) -> Double
+pub fn TokenWeights::new() -> Self
+pub fn TokenWeights::normalize(Self) -> Self
+pub fn TokenWeights::size(Self) -> Int
+
+pub(all) struct ValidationFinding {
+  severity : ValidationSeverity
+  code : String
+  message : String
+  token : String?
+}
+pub fn ValidationFinding::describe(Self) -> String
+
+pub(all) struct ValidationReport {
+  findings : Array[ValidationFinding]
+  mut checked_records : Int
+  mut checked_dimensions : Int
+}
+pub fn ValidationReport::add(Self, ValidationFinding) -> Unit
+pub fn ValidationReport::errors(Self) -> Int
+pub fn ValidationReport::is_valid(Self) -> Bool
+pub fn ValidationReport::messages(Self) -> Array[String]
+pub fn ValidationReport::new() -> Self
+pub fn ValidationReport::summary(Self) -> String
+pub fn ValidationReport::warnings(Self) -> Int
+
+pub(all) enum ValidationSeverity {
+  Info
+  Warning
+  Error
+}
+pub fn ValidationSeverity::label(Self) -> String
 
 // Type aliases
 

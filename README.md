@@ -18,6 +18,8 @@ Repository links:
 - Build sentence embeddings and a metadata-filtered document store
 - Export normalized corpora as GloVe-style or word2vec text
 - Report corpus health, recall, scanned candidates, and benchmark metrics
+- Provide explainable ranking profiles, query plans, validation reports, and
+  deterministic quantization helpers
 - Provide a small CLI demo and regression/edge-case test coverage
 
 ## Why this shape
@@ -99,6 +101,10 @@ moon info
 `SearchReport.candidates` and `scanned` make approximate-search tradeoffs
 observable. Use exact search as the baseline and `evaluate` to record recall
 on a domain corpus rather than relying on a synthetic timing claim.
+
+The repository also includes a dependency-free `BenchmarkSuite`,
+`TextTokenizer`, `DocumentFilter`, `QueryPlan`, and `ValidationReport` API for
+building repeatable application-level checks around the core index.
 
 ## Source notes
 

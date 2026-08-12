@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- Added a text preprocessing pipeline, phrase queries, benchmark suites,
+  explainable ranking, query plans, corpus validation, index diagnostics, and
+  deterministic quantization/representation tools.
+
+## v0.1.2
+
+- Expanded the implementation beyond 3,000 effective MoonBit source lines.
+- Added 22 deterministic tests covering ingestion, retrieval, filtering,
+  ranking, validation, benchmarking, sampling, and boundary behavior.
+
+## v0.1.1
+
 - Added corpus validation and statistics, portable text serialization, prefix/
   threshold/batch retrieval, recall evaluation, and document-store lifecycle
   APIs with edge-case regression coverage.
