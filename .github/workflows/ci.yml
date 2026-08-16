@@ -55,3 +55,6 @@ jobs:
           moon info
           git diff --exit-code -- pkg.generated.mbti cmd/main/pkg.generated.mbti
           moon build
+
+      - name: CLI smoke test
+        run: moon run cmd/main

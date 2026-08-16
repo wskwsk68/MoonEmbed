@@ -20,6 +20,7 @@ This file tracks the items the contest page explicitly cares about.
 - [x] Automated tests, including edge and regression cases
 - [x] Public-source-only code
 - [x] Source notes in README
+- [x] CI executes the runnable CLI smoke path on Ubuntu, macOS, and Windows
 
 ## Contest alignment
 
