@@ -47,7 +47,7 @@ fn is_ascii_digit(value : StringView) -> Bool {
 fn normalize_token(token : StringView, lowercase : Bool) -> String {
   let value = token.trim().to_owned()
   if lowercase {
-    value
+    value.to_lower()
   } else {
     value
   }

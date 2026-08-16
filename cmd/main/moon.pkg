@@ -2,6 +2,4 @@ import {
   "wskwsk68/MoonEmbed",
 }
 
-options(
-  "is-main": true,
-)
+pkgtype(kind: "executable")

@@ -11,9 +11,18 @@ The official rejection notes were not included in the workspace, so this reposit
 - A one-page Markdown submission draft was added.
 - CI, tests, and source notes were kept visible in the repository.
 
+## What was verified in the current acceptance pass
+
+- GitHub `main` and GitLink `master` point to the same latest source commit.
+- GitLink also retains a `main` mirror, but its default `master` branch is the
+  branch intended for reviewer entry.
+- The package README referenced by `moon.mod` is now complete and runnable.
+- CI covers formatting, strict checking, all targets, tests, interface
+  generation, and the demo build.
+- The local toolchain is MoonBit 0.10.7 and the strict local checks pass.
+
 ## What to watch before final submission
 
-- Confirm GitHub and GitLink both point to the same source tree.
-- Confirm the remote default branch is `main`.
+- Keep GitHub `main` and GitLink `master` synchronized.
 - Keep the final README and submission draft in sync.
 - Ensure the one-page PDF export uses the same wording as the Markdown draft.

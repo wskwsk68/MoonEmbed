@@ -446,4 +446,3 @@ pub fn ValidationSeverity::label(Self) -> String
 // Type aliases
 
 // Traits
-

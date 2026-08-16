@@ -6,6 +6,11 @@
   explainable ranking, query plans, corpus validation, index diagnostics, and
   deterministic quantization/representation tools.
 
+## v0.1.3
+
+- Updated the package-facing README, current MoonBit executable package
+  metadata, strict all-target CI, and tokenizer lowercasing behavior.
+
 ## v0.1.2
 
 - Expanded the implementation beyond 3,000 effective MoonBit source lines.
@@ -18,12 +23,6 @@
   threshold/batch retrieval, recall evaluation, and document-store lifecycle
   APIs with edge-case regression coverage.
 
-## v0.1.1
-
-- Hardened input validation and query boundary behavior.
-- Added production-oriented retrieval, corpus, and document tooling.
-- Expanded README and acceptance self-check evidence.
-
 ## v0.1.0
 
 - Added MoonBit-native embedding loading and local search.
@@ -31,5 +30,3 @@
 - Retargeted the project to the `wskwsk68` repository namespace.
 - Added corpus and index description helpers.
 - Improved phrase search so unknown tokens return an empty result instead of panicking.
-
-Initial contest-ready version of MoonEmbed.

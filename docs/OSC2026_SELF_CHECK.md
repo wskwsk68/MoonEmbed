@@ -30,21 +30,23 @@ This file tracks the items the contest page explicitly cares about.
 
 ## Remaining contest steps
 
-- [ ] Push the reviewed local commit(s) to a public GitHub repository (requires explicit authorization)
-- [ ] Add the final GitHub repo URL to the submission materials
-- [ ] Export the proposal as the required one-page PDF
-- [ ] Verify the remote default branch is `main`
-- [ ] Confirm the mooncakes.io publication link if you choose to publish the package
-- [ ] Make sure the GitLink repository is synchronized from the same source tree (requires explicit authorization)
+- [x] Push the reviewed commits to the public GitHub repository
+- [x] GitHub default branch is `main` and contains the latest commit
+- [x] GitLink default branch is `master` and contains the same latest commit
+- [x] GitHub and GitLink contain the same source tree on their default branches
+- [x] Publish the package to mooncakes.io
+- [ ] Export the proposal as the required one-page PDF (submission-material task; proposal files are intentionally not modified here)
 
 ## Local evidence
 
 - `moon check --deny-warn`: pass
 - `moon test --deny-warn`: pass
+- 23 deterministic tests pass on Wasm and Wasm-GC targets
 - `moon build`: pass
 - `moon info`: generated interface updated locally
-- Local MoonBit sources: approximately 1.3k lines after this pass; the contest's 4k~10k figure is a scale reference, not a license to add filler. Further scale should come from additional production features or real benchmark fixtures.
-- `mooncakes.io` publication cannot be verified or performed from this local-only pass.
+- Local MoonBit sources: approximately 3k effective lines after the production-feature expansion; the contest's 4k~10k figure remains a scale reference, not a license to add filler.
+- `mooncakes.io`: package `wskwsk68/MoonEmbed` version `0.1.3` will contain this acceptance-pass update.
+- The root and `docs/SUBMISSION_ONE_PAGE.md` proposal materials are intentionally left unchanged in this review.
 
 ## Source notes
 
