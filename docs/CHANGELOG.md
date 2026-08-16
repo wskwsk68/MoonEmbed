@@ -6,6 +6,11 @@
   explainable ranking, query plans, corpus validation, index diagnostics, and
   deterministic quantization/representation tools.
 
+## v0.1.5
+
+- Replaced the invalid CI setup action with the official MoonBit installation
+  workflow and added strict cross-platform checks.
+
 ## v0.1.4
 
 - Corrected the acceptance self-check wording after the `0.1.3` publication.

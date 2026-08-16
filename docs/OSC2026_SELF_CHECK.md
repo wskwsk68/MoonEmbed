@@ -45,7 +45,7 @@ This file tracks the items the contest page explicitly cares about.
 - `moon build`: pass
 - `moon info`: generated interface updated locally
 - Local MoonBit sources: approximately 3k effective lines after the production-feature expansion; the contest's 4k~10k figure remains a scale reference, not a license to add filler.
-- `mooncakes.io`: package `wskwsk68/MoonEmbed` version `0.1.4` contains the acceptance-pass update.
+- `mooncakes.io`: package `wskwsk68/MoonEmbed` version `0.1.5` contains the acceptance-pass update.
 - The root and `docs/SUBMISSION_ONE_PAGE.md` proposal materials are intentionally left unchanged in this review.
 
 ## Source notes
