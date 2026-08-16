@@ -6,6 +6,10 @@
   explainable ranking, query plans, corpus validation, index diagnostics, and
   deterministic quantization/representation tools.
 
+## v0.1.4
+
+- Corrected the acceptance self-check wording after the `0.1.3` publication.
+
 ## v0.1.3
 
 - Updated the package-facing README, current MoonBit executable package
