@@ -2,6 +2,10 @@
 package "wskwsk68/MoonEmbed"
 
 // Values
+pub fn all_application_scenarios_pass() -> Bool
+
+pub fn application_operations_smoke() -> Bool
+
 pub fn compare_corpora(EmbeddingCorpus, EmbeddingCorpus) -> CorpusCompatibility
 
 pub fn corpus_health(EmbeddingCorpus) -> String
@@ -34,9 +38,23 @@ pub fn quantize_vector(Array[Double], Int) -> Array[Int]
 
 pub fn recall_at_k(SearchReport, SearchReport, Int) -> Double
 
+pub fn run_application_scenarios() -> Array[ScenarioReport]
+
+pub fn run_documentation_scenario() -> ScenarioReport
+
+pub fn run_ingestion_guard_scenario() -> ScenarioReport
+
+pub fn run_scenario_matrix() -> ScenarioMatrixReport
+
+pub fn run_support_scenario() -> ScenarioReport
+
+pub fn scenario_operations_summary(ApplicationKnowledgeBase) -> String
+
 pub fn standard_benchmark_suite() -> BenchmarkSuite
 
 pub fn summarize_reports(Array[SearchReport]) -> RankingSummary
+
+pub fn support_knowledge_base() -> ApplicationKnowledgeBase
 
 pub fn validate_corpus(EmbeddingCorpus) -> ValidationReport
 
@@ -47,6 +65,104 @@ pub fn validate_vector(Array[Double], Int) -> ValidationReport
 // Errors
 
 // Types and methods
+pub(all) struct ApplicationAnswer {
+  found : Bool
+  query : String
+  document_id : String
+  text : String
+  category : String
+  score : Double
+}
+pub fn ApplicationAnswer::describe(Self) -> String
+pub fn ApplicationAnswer::found(Self) -> Bool
+
+pub(all) struct ApplicationDocumentSummary {
+  id : String
+  category : String
+  token_count : Int
+  known_token_count : Int
+  vector_ready : Bool
+}
+pub fn ApplicationDocumentSummary::describe(Self) -> String
+
+pub(all) struct ApplicationHit {
+  document : Document
+  score : Double
+  rank : Int
+}
+pub fn ApplicationHit::category(Self) -> String
+pub fn ApplicationHit::describe(Self) -> String
+pub fn ApplicationHit::id(Self) -> String
+pub fn ApplicationHit::score(Self) -> Double
+pub fn ApplicationHit::text(Self) -> String
+
+pub(all) struct ApplicationKnowledgeBase {
+  corpus : EmbeddingCorpus
+  index : MoonEmbedIndex
+  store : DocumentStore
+  tokenizer : TextTokenizer
+  policy : IngestionPolicy
+  session : QuerySession
+  counters : UsageCounters
+}
+pub fn ApplicationKnowledgeBase::admit_query(Self, ApplicationQuery) -> QueryAdmission
+pub fn ApplicationKnowledgeBase::answer(Self, ApplicationQuery) -> ApplicationAnswer
+pub fn ApplicationKnowledgeBase::categories(Self) -> Array[String]
+pub fn ApplicationKnowledgeBase::category_counts(Self) -> Map[String, Int]
+pub fn ApplicationKnowledgeBase::document_count(Self) -> Int
+pub fn ApplicationKnowledgeBase::document_ids(Self) -> Array[String]
+pub fn ApplicationKnowledgeBase::document_summaries(Self) -> Array[ApplicationDocumentSummary]
+pub fn ApplicationKnowledgeBase::documents_for_category(Self, String) -> Array[Document]
+pub fn ApplicationKnowledgeBase::export_category(Self, String) -> String
+pub fn ApplicationKnowledgeBase::export_documents(Self) -> String
+pub fn ApplicationKnowledgeBase::has_document(Self, String) -> Bool
+pub fn ApplicationKnowledgeBase::health(Self) -> String
+pub fn ApplicationKnowledgeBase::history(Self) -> Array[QueryEvent]
+pub fn ApplicationKnowledgeBase::ingest(Self, Document) -> IngestionResult
+pub fn ApplicationKnowledgeBase::ingest_many(Self, Array[Document]) -> Array[IngestionResult]
+pub fn ApplicationKnowledgeBase::ingest_with_report(Self, Array[Document]) -> IngestionBatchReport
+pub fn ApplicationKnowledgeBase::new(EmbeddingCorpus, signature_bits? : Int, tokenizer? : TextTokenizer, policy? : IngestionPolicy, session_name? : String) -> Self
+pub fn ApplicationKnowledgeBase::ready(Self) -> Bool
+pub fn ApplicationKnowledgeBase::remove_document(Self, String) -> Bool
+pub fn ApplicationKnowledgeBase::reset_session(Self) -> Unit
+pub fn ApplicationKnowledgeBase::search(Self, ApplicationQuery) -> ApplicationSearchReport
+pub fn ApplicationKnowledgeBase::search_category(Self, String, String, k? : Int) -> ApplicationSearchReport
+pub fn ApplicationKnowledgeBase::search_many(Self, Array[ApplicationQuery]) -> Array[ApplicationSearchReport]
+pub fn ApplicationKnowledgeBase::snapshot(Self) -> String
+pub fn ApplicationKnowledgeBase::trace_query(Self, ApplicationQuery) -> ApplicationQueryTrace
+pub fn ApplicationKnowledgeBase::usage(Self) -> UsageCounters
+pub fn ApplicationKnowledgeBase::validate_document(Self, Document) -> IngestionResult
+pub fn ApplicationKnowledgeBase::workflow_ready(Self) -> Bool
+
+pub(all) struct ApplicationQuery {
+  text : String
+  k : Int
+  filter : DocumentFilter
+  threshold : Double?
+}
+pub fn ApplicationQuery::describe(Self) -> String
+pub fn ApplicationQuery::new(String, k? : Int, filter? : DocumentFilter, threshold? : Double) -> Self
+pub fn ApplicationQuery::valid(Self) -> Bool
+
+pub(all) struct ApplicationQueryTrace {
+  admission : QueryAdmission
+  report : ApplicationSearchReport
+}
+pub fn ApplicationQueryTrace::describe(Self) -> String
+
+pub(all) struct ApplicationSearchReport {
+  query : ApplicationQuery
+  hits : Array[ApplicationHit]
+  candidates : Int
+  scanned : Int
+  unknown_terms : Int
+  filtered_documents : Int
+}
+pub fn ApplicationSearchReport::describe(Self) -> String
+pub fn ApplicationSearchReport::ids(Self) -> Array[String]
+pub fn ApplicationSearchReport::is_empty(Self) -> Bool
+pub fn ApplicationSearchReport::top(Self) -> ApplicationHit?
+
 pub(all) struct BenchmarkDocument {
   id : String
   category : String
@@ -201,6 +317,53 @@ pub(all) struct IndexDiagnostics {
 }
 pub fn IndexDiagnostics::describe(Self) -> String
 
+pub(all) struct IngestionBatchReport {
+  attempted : Int
+  accepted : Int
+  rejected : Int
+  skipped : Int
+  diagnostics : Array[IngestionIssue]
+}
+pub fn IngestionBatchReport::acceptance_rate(Self) -> Double
+pub fn IngestionBatchReport::complete(Self) -> Bool
+pub fn IngestionBatchReport::describe(Self) -> String
+
+pub(all) struct IngestionIssue {
+  code : String
+  message : String
+  document_id : String
+}
+pub fn IngestionIssue::describe(Self) -> String
+
+pub(all) struct IngestionPolicy {
+  max_documents : Int
+  min_tokens : Int
+  require_category : Bool
+  reject_unknown_only : Bool
+  replace_existing : Bool
+}
+pub fn IngestionPolicy::conservative() -> Self
+pub fn IngestionPolicy::demo() -> Self
+pub fn IngestionPolicy::describe(Self) -> String
+pub fn IngestionPolicy::valid(Self) -> Bool
+
+pub(all) struct IngestionResult {
+  document_id : String
+  status : IngestionStatus
+  token_count : Int
+  known_token_count : Int
+  issues : Array[IngestionIssue]
+}
+pub fn IngestionResult::accepted(Self) -> Bool
+pub fn IngestionResult::describe(Self) -> String
+
+pub(all) enum IngestionStatus {
+  Accepted
+  Rejected
+  Skipped
+}
+pub fn IngestionStatus::label(Self) -> String
+
 pub(all) struct MoonEmbedIndex {
   corpus : EmbeddingCorpus
   buckets : Array[Array[Int]]
@@ -236,6 +399,26 @@ pub fn PhraseQuery::new(String, TextTokenizer) -> Self
 pub fn PhraseQuery::size(Self) -> Int
 pub fn PhraseQuery::weight(Self, Int) -> Double
 
+pub(all) struct QueryAdmission {
+  accepted : Bool
+  normalized : String
+  token_count : Int
+  known_token_count : Int
+  reason : String
+}
+pub fn QueryAdmission::accepted(Self) -> Bool
+pub fn QueryAdmission::describe(Self) -> String
+pub fn QueryAdmission::known_ratio(Self) -> Double
+
+pub(all) struct QueryEvent {
+  sequence : Int
+  query : ApplicationQuery
+  result_count : Int
+  top_score : Double
+  candidates : Int
+}
+pub fn QueryEvent::describe(Self) -> String
+
 pub(all) struct QueryPlan {
   mode : RetrievalMode
   k : Int
@@ -259,6 +442,20 @@ pub fn QuerySampler::label(Self, Int) -> String?
 pub fn QuerySampler::new(Int) -> Self
 pub fn QuerySampler::query(Self, Int) -> Array[Double]?
 pub fn QuerySampler::size(Self) -> Int
+
+pub(all) struct QuerySession {
+  name : String
+  max_events : Int
+  events : Array[QueryEvent]
+  mut next_sequence : Int
+}
+pub fn QuerySession::clear(Self) -> Unit
+pub fn QuerySession::describe(Self) -> String
+pub fn QuerySession::history(Self) -> Array[QueryEvent]
+pub fn QuerySession::last(Self) -> QueryEvent?
+pub fn QuerySession::new(String, max_events? : Int) -> Self
+pub fn QuerySession::record(Self, ApplicationQuery, ApplicationSearchReport) -> Unit
+pub fn QuerySession::size(Self) -> Int
 
 pub(all) struct RankedDocument {
   id : String
@@ -306,6 +503,32 @@ pub fn SampleStats::add(Self, Double) -> Unit
 pub fn SampleStats::describe(Self) -> String
 pub fn SampleStats::mean(Self) -> Double
 pub fn SampleStats::new() -> Self
+
+pub(all) struct ScenarioMatrixReport {
+  scenarios : Int
+  passed : Int
+  total_documents : Int
+  total_queries : Int
+  total_rejected : Int
+  total_skipped : Int
+}
+pub fn ScenarioMatrixReport::all_passed(Self) -> Bool
+pub fn ScenarioMatrixReport::describe(Self) -> String
+
+pub(all) struct ScenarioReport {
+  name : String
+  ingested : Int
+  rejected : Int
+  skipped : Int
+  queries : Int
+  nonempty_queries : Int
+  expected_matches : Int
+  observed_matches : Int
+  expected_rejected : Int
+  expected_skipped : Int
+}
+pub fn ScenarioReport::describe(Self) -> String
+pub fn ScenarioReport::passed(Self) -> Bool
 
 pub(all) struct ScoreComponents {
   lexical : Double
@@ -414,6 +637,21 @@ pub fn TokenWeights::get(Self, String) -> Double
 pub fn TokenWeights::new() -> Self
 pub fn TokenWeights::normalize(Self) -> Self
 pub fn TokenWeights::size(Self) -> Int
+
+pub(all) struct UsageCounters {
+  mut ingestion_attempts : Int
+  mut accepted_documents : Int
+  mut rejected_documents : Int
+  mut skipped_documents : Int
+  mut query_attempts : Int
+  mut empty_queries : Int
+  mut returned_hits : Int
+  mut scanned_candidates : Int
+}
+pub fn UsageCounters::describe(Self) -> String
+pub fn UsageCounters::new() -> Self
+pub fn UsageCounters::record_ingestion(Self, IngestionResult) -> Unit
+pub fn UsageCounters::record_query(Self, ApplicationSearchReport) -> Unit
 
 pub(all) struct ValidationFinding {
   severity : ValidationSeverity

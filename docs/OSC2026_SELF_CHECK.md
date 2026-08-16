@@ -10,7 +10,8 @@ This file tracks the items the contest page explicitly cares about.
 - [x] CI workflow in `.github/workflows/ci.yml`
 - [x] README present in both MoonBit and GitHub-friendly form
 - [x] Single contributor only, no virtual or extra contributors
-- [x] Commit count is above 10 before this local update (new local work remains uncommitted until review)
+- [x] Commit count is above 10 and the application-layer update is recorded as
+  a focused feature commit
 
 ## Submission quality
 
@@ -27,6 +28,10 @@ This file tracks the items the contest page explicitly cares about.
 - [x] Differs from a general vector database
 - [x] Includes a lightweight approximate index and an exact evaluation baseline
 - [x] Corpus validation, serialization, document store, thresholds, prefixes, and batch search
+- [x] Complete offline application workflow: ingestion policy, audit results,
+  filtered queries, session history, export, health, and usage reporting
+- [x] Deterministic real-usage scenarios for support, documentation, and
+  ingestion guardrails, including accepted/rejected/skipped/boundary paths
 
 ## Remaining contest steps
 
@@ -41,11 +46,15 @@ This file tracks the items the contest page explicitly cares about.
 
 - `moon check --deny-warn`: pass
 - `moon test --deny-warn`: pass
-- 23 deterministic tests pass on Wasm and Wasm-GC targets
+- 35 deterministic tests pass on Wasm and Wasm-GC targets
 - `moon build`: pass
 - `moon info`: generated interface updated locally
-- Local MoonBit sources: approximately 3k effective lines after the production-feature expansion; the contest's 4k~10k figure remains a scale reference, not a license to add filler.
-- `mooncakes.io`: package `wskwsk68/MoonEmbed` version `0.1.5` contains the acceptance-pass update.
+- Local MoonBit sources: 4,264 effective production lines (4,437 including
+  tests), including the application workflow, operations layer, and scenario
+  matrix; the added code is exercised by tests and is tied to the documented
+  support/documentation use cases.
+- `mooncakes.io`: package `wskwsk68/MoonEmbed` version `0.1.6` contains this
+  application-layer update after publication.
 - The root and `docs/SUBMISSION_ONE_PAGE.md` proposal materials are intentionally left unchanged in this review.
 
 ## Source notes

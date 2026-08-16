@@ -20,6 +20,9 @@ Repository links:
 - Report corpus health, recall, scanned candidates, and benchmark metrics
 - Provide explainable ranking profiles, query plans, validation reports, and
   deterministic quantization helpers
+- Provide an application knowledge-base layer with ingestion policies,
+  operator diagnostics, bounded query sessions, batch search, exports, health
+  reports, and reproducible support/documentation scenarios
 - Provide a small CLI demo and regression/edge-case test coverage
 
 ## Why this shape
@@ -105,6 +108,35 @@ on a domain corpus rather than relying on a synthetic timing claim.
 The repository also includes a dependency-free `BenchmarkSuite`,
 `TextTokenizer`, `DocumentFilter`, `QueryPlan`, and `ValidationReport` API for
 building repeatable application-level checks around the core index.
+
+### Real application workflow
+
+`ApplicationKnowledgeBase` demonstrates the complete offline workflow used by
+an embedded support or documentation tool: validate and ingest documents,
+reject unknown-only or malformed input with an audit record, run filtered
+semantic queries, retain bounded session history, export accepted documents,
+and inspect health/usage counters. Operational helpers add query admission
+traces, batch acceptance reports, document inventory summaries, category
+exports, top-hit answers, and readiness snapshots. The built-in scenarios are
+deterministic and exercise normal, rejected, skipped, filtered, empty-query,
+and export paths without downloading model weights or contacting a service.
+
+```moonbit
+let knowledge = support_knowledge_base()
+let results = knowledge.ingest_many([
+  Document::new(
+    "faq-login",
+    "king queen",
+    metadata=Map([("category", "support")]),
+  ),
+])
+let report = knowledge.search(ApplicationQuery::new("king", k=3))
+println(report.describe())
+```
+
+Run `run_application_scenarios()` or `run_scenario_matrix()` from MoonBit
+tests/tools to verify the same end-to-end behavior across support,
+documentation, and ingestion-guard cases.
 
 ## Source notes
 

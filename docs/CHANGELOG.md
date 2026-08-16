@@ -6,6 +6,18 @@
   explainable ranking, query plans, corpus validation, index diagnostics, and
   deterministic quantization/representation tools.
 
+## v0.1.6
+
+- Added a production-shaped `ApplicationKnowledgeBase` workflow for bounded
+  document ingestion, audit diagnostics, filtered/batch search, query-session
+  history, export, health, and usage reporting.
+- Added deterministic support, documentation, ingestion-guard, and scenario
+  matrix coverage, including accepted, rejected, skipped, empty-query, and
+  boundary paths.
+- Expanded the effective production MoonBit implementation to 4,264 source
+  lines and the deterministic suite to 35 tests without changing proposal
+  materials.
+
 ## v0.1.5
 
 - Replaced the invalid CI setup action with the official MoonBit installation
